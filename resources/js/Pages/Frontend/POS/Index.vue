@@ -3,7 +3,7 @@
     <div>
       <h1 class="text-2xl font-bold mb-4">Point of Sale</h1>
       <div class="flex">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden w-[70%] max-h-[470px]">
           <div class="flex items-center p-4 border-b border-neutral-200">
             <label for="search" class="mr-2 font-medium">Search:</label>
             <input
@@ -40,7 +40,6 @@
                   <th scope="col" class="px-6 py-4">Name</th>
                   <th scope="col" class="px-6 py-4">Category</th>
                   <th scope="col" class="px-6 py-4">Price</th>
-                  <th scope="col" class="px-6 py-4">Description</th>
                   <th scope="col" class="px-6 py-4">Action</th>
                 </tr>
               </thead>
@@ -50,7 +49,6 @@
                   <td class="whitespace-nowrap px-6 py-4">{{ item.name }}</td>
                   <td class="whitespace-nowrap px-6 py-4">{{ categoryMap[item.category_id] || 'Uncategorized' }}</td>
                   <td class="whitespace-nowrap px-6 py-4"><a>₱ </a>{{ item.price }}</td>
-                  <td class="whitespace-nowrap px-6 py-4">{{ item.description }}</td>
                   <td class="whitespace-nowrap px-6 py-4">
                     <button @click="addToCart(item)">Add</button>
                   </td>
