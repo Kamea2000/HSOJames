@@ -5,6 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\POSController;
+use App\Http\Controllers\CartController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,9 +27,7 @@ Route::get('/placeholder', function () {
 
 Route::resource('products', ProductController::class);
 Route::resource('patients', PatientController::class);
-Route::resource('categories', CategoryController::class);
 Route::resource('pos', POSController::class);
-
 
 
 

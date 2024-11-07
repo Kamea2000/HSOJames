@@ -58,8 +58,11 @@
     </button>
 </div>
             </div>
-
+            
             <div class="overflow-x-auto">
+                <div v-if="products.length === 0" class="text-gray-500 text-center py-8">
+                    No products yet
+                </div>
                 <table class="min-w-full text-left text-sm font-light text-gray-700">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-200">
                         <tr>

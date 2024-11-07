@@ -20,6 +20,23 @@ class ProductController extends Controller
         ]);
     }
 
+    public function search(Request $request)
+    {
+        // Search products by name
+        $query = $request->input('query');
+        $products = Product::where('name', 'like', '%' . $query . '%')->get();
+
+        return response()->json($products);
+    }
+
+    public function filterByCategory($categoryId)
+    {
+        // Filter products by category
+        $products = Product::where('category_id', $categoryId)->get();
+
+        return response()->json($products);
+    }
+
     public function create()
     {
         return Inertia::render('Frontend/Product/Create');
