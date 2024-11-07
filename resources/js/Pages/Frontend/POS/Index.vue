@@ -79,7 +79,7 @@
     
         <!-- Cart Summary Section -->
         <div class="w-1/3 p-4">
-          <CartSummary :cartItems="cartItems" @remove="removeFromCart" />
+          <CartSummary :cartItems="cartItems" :cartTotal="cartTotal" @remove="removeFromCart" @update-quantity="handleUpdateQuantity"/>
           <PaymentOptions :cartTotal="cartTotal" @processPayment="processPayment" />
         </div>
       </div>
@@ -193,7 +193,8 @@ const addToCart = (product) => {
   }
 };
 
-// Cart Total Calculation
+
+//Cart Total Calculation
 const cartTotal = computed(() => {
   return cartItems.value.reduce((total, item) => total + item.price * item.quantity, 0);
 });
@@ -210,5 +211,10 @@ const processPayment = (paymentDetails) => {
 
   // After payment is processed, you can reset the cart or navigate to another page
   cartItems.value = [];  // Clear cart after successful payment
+};
+
+const handleUpdateQuantity = ({ itemId, quantity }) => {
+  const item = cartItems.value.find(item => item.id === itemId);
+  if (item) item.quantity = quantity;
 };
 </script>
