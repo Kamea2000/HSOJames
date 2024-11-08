@@ -28,6 +28,8 @@ Route::get('/placeholder', function () {
 Route::resource('products', ProductController::class);
 Route::resource('patients', PatientController::class);
 Route::resource('pos', POSController::class);
+Route::resource('categories', CategoryController::class);
+
 
 
 

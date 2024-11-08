@@ -10,7 +10,7 @@
         </div>
         <div class="mb-4">
           <label for="price" class="block mb-2 text-sm font-medium text-gray-900">Price</label>
-          <input v-model="product.price" id="price" type="number" class="border w-full p-2 mt-1 rounded" required />
+          <input v-model="product.price" id="price" step="0.01" type="number" class="border w-full p-2 mt-1 rounded" required />
         </div>
         <div class="mb-4">
           <label for="category" class="block mb-2 text-sm font-medium text-gray-900">Select Category</label>

@@ -81,7 +81,10 @@
                             <td class="whitespace-nowrap px-6 py-4">{{ item.name }}</td>
                             <td class="whitespace-nowrap px-6 py-4">{{ categoryMap[item.category_id] || 'Uncategorized' }}</td>
                             <td class="whitespace-nowrap px-6 py-4"><a>₱ </a>{{ item.price }}</td>
-                            <td class="whitespace-nowrap px-6 py-4">{{ item.description }}</td>
+                            <td class="whitespace-nowrap px-6 py-4">
+  {{ item.description.length > 25 ? item.description.slice(0, 25) + '...' : item.description }}
+</td>
+
                             <td class="whitespace-nowrap px-6 py-4">{{ item.quantity }}</td>
                             <td>
                                 <button
@@ -214,16 +217,16 @@ const closeAddCategoryModal = () => {
 // });
 
 const addCategory = (categoryName) => {
-    console.log('Category:', categoryName); // Should log the category name
-    Inertia.post(route('categories.store'), { name: categoryName }, {
-        onSuccess: () => {
-            closeAddCategoryModal(); // Use correct close function name
-            console.log('Category added successfully');
-        },
-        onError: (errors) => {
-            console.error('Error adding category:', errors); // Logs backend validation errors or other issues
-        }
-    });
+  console.log('Category:', categoryName); // Logs the category name being sent to the backend
+  Inertia.post(route('categories.store'), { name: categoryName }, {
+    onSuccess: () => {
+      closeAddCategoryModal(); // Close the modal when the category is added successfully
+      console.log('Category added successfully');
+    },
+    onError: (errors) => {
+      console.error('Error adding category:', errors); // Logs backend validation errors or other issues
+    }
+  });
 };
 
 
@@ -421,3 +424,5 @@ if (flashMessage.value) {
     closeAlertAfterTimeout();
 }
 </script>
+<style>
+</style>
