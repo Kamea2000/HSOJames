@@ -8,14 +8,14 @@
       >
         &times;
       </button>
-      <h2 class="text-xl font-semibold">Update Patient</h2>
+      <h2 class="text-xl font-semibold">Edit Patient</h2>
       <form @submit.prevent="submit">
         <!-- Form grid for two-column layout -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           <div>
             <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">First Name</label>
             <input
-              v-model="patient.first_name"
+              v-model="first_name"
               id="first_name"
               type="text"
               class="border w-full p-2 mt-1 rounded"
@@ -26,7 +26,7 @@
           <div>
             <label for="last_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Last Name</label>
             <input
-              v-model="patient.last_name"
+              v-model="last_name"
               id="last_name"
               type="text"
               class="border w-full p-2 mt-1 rounded"
@@ -38,7 +38,7 @@
           <div>
             <label for="gender" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Gender</label>
             <select
-              v-model="patient.gender"
+              v-model="gender"
               id="gender"
               class="border w-full p-2 mt-1 rounded"
               required
@@ -53,7 +53,7 @@
           <div>
             <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
             <input
-              v-model="patient.email"
+              v-model="email"
               id="email"
               type="email"
               class="border w-full p-2 mt-1 rounded"
@@ -65,19 +65,22 @@
           <div>
             <label for="phone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
             <input
-              v-model="patient.phone"
+              v-model="phone"
               id="phone"
               type="tel"
               class="border w-full p-2 mt-1 rounded"
               required
               placeholder="Enter your phone number"
+              autocomplete="tel"
+              autocorrect="off"
+              autocapitalize="none"
             />
           </div>
 
           <div>
             <label for="date_of_birth" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date of Birth</label>
             <input
-              v-model="patient.date_of_birth"
+              v-model="date_of_birth"
               id="date_of_birth"
               type="date"
               class="border w-full p-2 mt-1 rounded"
@@ -88,9 +91,9 @@
           <div class="md:col-span-2">
             <label for="address" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Address</label>
             <input
-              v-model="patient.address"
+              v-model="address"
               id="address"
-              class="border w-full p-2 mt-1 rounded"
+              class="border w-full p-2 mt-1 rounded resize-none overflow-hidden h-10"
               required
               placeholder="Enter your address"
             />
@@ -99,7 +102,7 @@
           <div class="md:col-span-2">
             <label for="occupation" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Occupation</label>
             <input
-              v-model="patient.occupation"
+              v-model="occupation"
               id="occupation"
               class="border w-full p-2 mt-1 rounded"
               required
@@ -109,8 +112,11 @@
         </div>
 
         <div class="flex items-center space-x-4 mt-4">
-          <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-            Update Patient
+          <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 flex items-center space-x-2">
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Edit Patient</span>
           </button>
           <button
             type="button"
@@ -128,37 +134,49 @@
 <script setup>
 import { ref, defineProps, defineEmits, watch } from 'vue';
 
-const props = defineProps({
-  isOpen: Boolean,
-  patientData: Object,  // Expecting a prop for the patient data
-});
+const props = defineProps(['isOpen', 'patientData']);
+const emit = defineEmits();
 
-const emit = defineEmits(['update', 'close']);
+const first_name = ref('');
+const last_name = ref('');
+const gender = ref('');
+const email = ref('');
+const phone = ref('');
+const date_of_birth = ref('');
+const address = ref('');
+const occupation = ref('');
 
-const patient = ref({
-  first_name: '',
-  last_name: '',
-  gender: '',
-  email: '',
-  phone: '',
-  date_of_birth: '',
-  address: '',
-  occupation: '',
-});
-
-// Watch for changes to the patientData prop (use it to fill the form)
+// Watch for changes in patientData and update the form fields
 watch(() => props.patientData, (newData) => {
   if (newData) {
-    patient.value = { ...newData };
+    first_name.value = newData.first_name || '';
+    last_name.value = newData.last_name || '';
+    gender.value = newData.gender || '';
+    email.value = newData.email || '';
+    phone.value = newData.phone || '';
+    date_of_birth.value = newData.date_of_birth || '';
+    address.value = newData.address || '';
+    occupation.value = newData.occupation || '';
   }
 }, { immediate: true });
 
 const submit = () => {
-  emit('update', { ...patient.value });  // Emit the update event with the patient data
-  close();
+    const data = {
+        id: props.patientData.id,
+        first_name: first_name.value,
+        last_name: last_name.value,
+        gender: gender.value,
+        email: email.value,
+        phone: phone.value,
+        date_of_birth: date_of_birth.value,
+        address: address.value,
+        occupation: occupation.value,
+    };
+    emit('edit', data);
+    emit('close');
 };
 
 const close = () => {
-  emit('close');  // Close the modal
+  emit('close');
 };
 </script>

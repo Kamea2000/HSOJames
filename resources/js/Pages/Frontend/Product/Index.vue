@@ -71,6 +71,7 @@
                             <th scope="col" class="px-6 py-4">Category</th>
                             <th scope="col" class="px-6 py-4">Price</th>
                             <th scope="col" class="px-6 py-4">Description</th>
+                            <th scope="col" class="px-6 py-4">Quantity</th>
                             <th scope="col" class="px-6 py-4"></th>
                         </tr>
                     </thead>
@@ -81,6 +82,7 @@
                             <td class="whitespace-nowrap px-6 py-4">{{ categoryMap[item.category_id] || 'Uncategorized' }}</td>
                             <td class="whitespace-nowrap px-6 py-4"><a>₱ </a>{{ item.price }}</td>
                             <td class="whitespace-nowrap px-6 py-4">{{ item.description }}</td>
+                            <td class="whitespace-nowrap px-6 py-4">{{ item.quantity }}</td>
                             <td>
                                 <button
                                     id="apple-ipad-air-dropdown-button"
@@ -98,7 +100,7 @@
                                     <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                                 </svg>
                                 </button>
-
+                    <div class="relative">
                         <!-- Dropdown Menu -->
                         <div v-if="dropdownOpen === item.id" class="absolute right-0 z-50 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                             <ul class="py-1 text-sm" aria-labelledby="apple-ipad-air-dropdown-button">
@@ -130,6 +132,7 @@
                                 </li>
                             </ul>
                         </div>
+                        </div>
                         </td>
                         </tr>
                     </tbody>
@@ -156,8 +159,8 @@
     </div>
 
     <ShowModal :isOpen="showModal" :product="selectedProduct" @close="closeModal" />
-    <EditModal :isOpen="editModal" :product="selectedProduct" :categories="props.categories" @close="closeModal" @save="updateProduct" />
-    <AddProductModal :isOpen="addModal" :categories="props.categories" @close="closeAddModal" @add="addProduct" />
+    <EditModal :isOpen="editModal" :product="selectedProduct" :categories="categories" @close="closeModal" @save="updateProduct" />
+    <AddProductModal :isOpen="addModal" :categories="categories" @close="closeAddModal" @add="addProduct" />
     <AddCategoryModal :isOpen="isCategoryModalOpen" @add="addCategory" @close="closeAddCategoryModal" />
     <DeleteConfirmationModal :isOpen="deleteModal" :productName="productNameToDelete" @close="closeDeleteModal" @confirm="confirmDeleteProduct" />
 </DashboardLayout>
@@ -205,6 +208,11 @@ const closeAddCategoryModal = () => {
   isCategoryModalOpen.value = false;
 };
 
+// const paginatedProducts = computed(() => {
+//     const startIndex = (currentPage.value - 1) * itemsPerPage.value;
+//     return props.products.slice(startIndex, startIndex + itemsPerPage.value);
+// });
+
 const addCategory = (categoryName) => {
     console.log('Category:', categoryName); // Should log the category name
     Inertia.post(route('categories.store'), { name: categoryName }, {
@@ -219,13 +227,25 @@ const addCategory = (categoryName) => {
 };
 
 
+const filterByCategory = () => {
+    if (selectedCategory.value) {
+        // Filter products based on selected category
+        props.products = props.products.filter(product => product.category_id === selectedCategory.value);
+    }
+};
+
 // Computed property for filtering products by search
 const filteredProducts = computed(() => {
-    return props.products.filter(product => {
-        const matchesSearch = product.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-        const matchesCategory = selectedCategory.value === '' || product.category_id === selectedCategory.value;
-        return matchesSearch && matchesCategory && product.name.toLowerCase().includes(searchQuery.value.toLowerCase());
-    });
+    let filtered = props.products;
+    if (searchQuery.value) {
+        filtered = filtered.filter(product =>
+            product.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
+    }
+    if (selectedCategory.value) {
+        filtered = filtered.filter(product => product.category_id === selectedCategory.value);
+    }
+    return filtered;
 });
 
 // Computed properties for pagination
@@ -296,6 +316,7 @@ const updateProduct = (updatedProduct) => {
         price: updatedProduct.price,
         description: updatedProduct.description,
         category_id: updatedProduct.category_id,
+        quantity: updatedProduct.quantity
     }, {
         onSuccess: () => {
             console.log('Product updated successfully'); // Log success
@@ -313,7 +334,8 @@ const addProduct = (product) => {
         name: product.name,
         price: product.price,
         category_id: product.category_id, // Ensure this matches your modal's v-model
-        description: product.description
+        description: product.description,
+        quantity: product.quantity
     }, {
         onSuccess: () => {
             closeAddModal(); // Close the modal after a successful addition

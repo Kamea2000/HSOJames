@@ -145,8 +145,16 @@
      
       <!-- Modal Component -->
       <ShowModal :isOpen="showModal" :patients="selectedPatients" @close="closeModal" />
-      <EditModal :isOpen="editModal" :patientData="selectedPatients" :patient="props.patients" @close="closeModal" @save="updatePatient" />
-      <AddPatientModal :isOpen="addModal" :patients="props.patients" @close="closeAddModal" @add="addPatient" />
+      <EditModal
+    :isOpen="editModal"
+    :patientData="selectedPatients"
+    @close="closeModal"
+    @edit="updatePatient"
+/>
+
+      <!-- <EditModal :isOpen="editModal" :patientData="selectedPatients" @close="closeModal" @save="updatePatient" /> -->
+
+      <AddPatientModal :isOpen="addModal" :patients="patients" @close="closeAddModal" @add="addPatient" />
       <DeletePatientModal 
     :isOpen="deleteModal" 
     :patientName="patientNameToDelete" 
@@ -169,6 +177,7 @@ import { onMounted, onBeforeUnmount } from 'vue';
 
 const props = defineProps({
     patients: Array,
+    default: () => ({}),
     flash: Object,
 });
 
@@ -185,9 +194,13 @@ const patientNameToDelete = ref('');
 
 // Modal management SHOW and EDIT/Update
 const openModal = (type, item) => {
-    selectedPatients.value = item;
-    if (type === 'show') showModal.value = true;
-    if (type === 'edit') editModal.value = true;
+    if (type === 'edit') {
+        selectedPatients.value = item; // Set the selected patient
+        editModal.value = true;
+    } else if (type === 'show') {
+        selectedPatients.value = item; // Set the selected patient
+        showModal.value = true;
+    }
 };
 
 
@@ -197,45 +210,33 @@ const closeModal = () => {
     selectedPatients.value = null;
 };
 // Computed property to filter patients based on search query
-const filteredProducts = computed(() => {
+const filteredPatients = computed(() => {
     if (!searchQuery.value) {
         return props.patients;
     }
     return props.patients.filter(patient => {
-        return patient.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-               patient.phone.includes(searchQuery.value) ||
-               patient.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-               patient.occupation.toLowerCase().includes(searchQuery.value.toLowerCase());
+        return (
+            patient.first_name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            patient.last_name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+            patient.email.toLowerCase().includes(searchQuery.value.toLowerCase())
+        );
     });
 });
 
 
 const updatePatient = (updatedPatient) => {
     console.log('Updated patient data:', updatedPatient); // Check updated patient data
-    Inertia.put(route('patients.update', updatedPatient.id), {
-        first_name: updatedPatient.first_name,
-        last_name: updatedPatient.last_name,
-        gender: updatedPatient.gender,
-        email: updatedPatient.email,
-        phone: updatedPatient.phone,
-        date_of_birth: updatedPatient.date_of_birth,
-        address: updatedPatient.address,
-        occupation: updatedPatient.occupation,
-    }, {
+    Inertia.put(route('patients.update', updatedPatient.id), updatedPatient, {
         onSuccess: () => {
-            closeEditModal(); // Close the modal after a successful update
-            console.log('Patient updated successfully');
+            flashMessage.value = 'Patient updated successfully!';
+            closeEditModal();
         },
         onError: (errors) => {
             console.error('Error updating patient:', errors);
+            flashMessage.value = 'Error updating patient. Please try again.';
         }
     });
 };
-
-
-
-
-
 
 //Delete Patient Function
 const deletePatient = (patientId) => {
@@ -269,29 +270,31 @@ const confirmDeletePatient = () => {
 };
 
 // Computed property for total items
-const totalItems = computed(() => filteredProducts.value.length);
+const totalItems = computed(() => filteredPatients.value.length);
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
+const startItem = computed(() => (currentPage.value - 1) * itemsPerPage.value + 1);
+const endItem = computed(() => Math.min(startItem.value + itemsPerPage.value - 1, totalItems.value));
 
 // Computed property for pagination
 const paginatedPatients = computed(() => {
     const start = (currentPage.value - 1) * itemsPerPage.value;
-    return filteredProducts.value.slice(start, start + itemsPerPage.value).map(patient => ({
+    return filteredPatients.value.slice(start, start + itemsPerPage.value).map(patient => ({
         ...patient,
         age: calculateAge(patient.date_of_birth) // Add the age property
     }));
 });
 
-// Computed property for total pages
-const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
+// const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage.value));
 
-// Computed properties for startItem and endItem
-const startItem = computed(() => {
-    return (currentPage.value - 1) * itemsPerPage.value + 1; // +1 because page starts from 1
-});
+// // Computed properties for startItem and endItem
+// const startItem = computed(() => {
+//     return (currentPage.value - 1) * itemsPerPage.value + 1; // +1 because page starts from 1
+// });
 
-const endItem = computed(() => {
-    const end = currentPage.value * itemsPerPage.value;
-    return end > totalItems.value ? totalItems.value : end; // Prevent going beyond total items
-});
+// const endItem = computed(() => {
+//     const end = currentPage.value * itemsPerPage.value;
+//     return end > totalItems.value ? totalItems.value : end; // Prevent going beyond total items
+// });
 
 // Pagination navigation functions
 const nextPage = () => {
@@ -342,9 +345,10 @@ const addPatient = (patient) => {
 //for dropdown modal add, edit, delete
 const dropdownOpen = ref(null); // Store the id of the opened dropdown
 
-const toggleDropdown = (itemId) => {
-    dropdownOpen.value = dropdownOpen.value === itemId ? null : itemId; // Toggle dropdown visibility
+const toggleDropdown = (id) => {
+  dropdownOpen.value = dropdownOpen.value === id ? null : id; // Toggle dropdown based on id
 };
+
 
 const closeDropdown = () => {
     dropdownOpen.value = null;
@@ -374,6 +378,21 @@ const calculateAge = (dateOfBirth) => {
     const ageDate = new Date(ageDiff);
     return Math.abs(ageDate.getUTCFullYear() - 1970); // Calculate age
 };
+
+onMounted(() => {
+    window.addEventListener('click', (event) => {
+        const target = event.target;
+        const isDropdownButton = target.closest('#apple-ipad-air-dropdown-button'); // Check if clicked inside the button
+        const isDropdownMenu = target.closest('.absolute'); // Check if clicked inside the dropdown
+        if (!isDropdownButton && !isDropdownMenu) {
+            closeDropdown(); // Close if clicked outside
+        }
+    });
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('click', closeDropdown);
+});
 
 const flashMessage = ref(props.flash.message); 
 

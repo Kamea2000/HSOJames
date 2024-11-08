@@ -25,6 +25,10 @@
           <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Description</label>
           <textarea v-model="product.description" id="description" rows="4" class="border w-full p-2 mt-1 rounded" placeholder="Write product description here"></textarea>
         </div>
+        <div class="mb-4">
+          <label for="quantity" class="block mb-2 text-sm font-medium text-gray-900">Quantity</label>
+          <input v-model="product.quantity" id="quantity" type="number" class="border w-full p-2 mt-1 rounded" required />
+        </div>
         <div class="flex justify-between">
           <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Add Product</button>
           <button @click.prevent="close" class="bg-gray-300 text-black px-4 py-2 rounded">Cancel</button>
@@ -54,9 +58,11 @@ const product = ref({
   price: '',
   category_id: null, // Store category ID here
   description: '',
+  quantity: ''
 });
 
 const submit = () => {
+  console.log('Product data before submit:', product.value);
   if (!product.value.category_id) {
     alert("Please select a category.");
     return;
@@ -67,14 +73,18 @@ const submit = () => {
     name: product.value.name,          // Product Name
     price: product.value.price,        // Product Price
     category_id: product.value.category_id, // Selected Category ID
-    description: product.value.description // Product Description
+    description: product.value.description, // Product Description
+    quantity: product.quantity
   });
 
-  resetForm();
-  emit('close'); // Close modal after submission
-};
+  emit('add', { 
+    name: product.value.name,
+    price: product.value.price,
+    category_id: product.value.category_id,
+    description: product.value.description,
+    quantity: product.value.quantity
+  });
 
-const close = () => {
   resetForm();
   emit('close');
 };

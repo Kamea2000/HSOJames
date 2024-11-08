@@ -17,6 +17,9 @@
         <div class="mb-2">
           <p><strong>Category:</strong> <span class="text-gray-700">{{ product.category ? product.category.name : 'Uncategorized' }}</span></p>
         </div>
+        <div class="mb-2">
+          <p><strong>Quantity:</strong> <span class="text-gray-700">{{ product.quantity }}</span></p>
+        </div>
       </div>
     </div>
   </template>

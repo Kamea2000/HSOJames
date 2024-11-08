@@ -43,21 +43,18 @@ class ProductController extends Controller
     }
 
     public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'name' => 'required|string|max:255',          // Validate product name
-        'price' => 'required|numeric',                 // Validate product price
-        'category_id' => 'required|exists:categories,id', // Validate category ID exists in the categories table
-        'description' => 'nullable|string',            // Validate description (optional)
-    ]);
-
-    // Create the product with the validated data
-    $product = Product::create([
-        'name' => $validatedData['name'],
-        'price' => $validatedData['price'],
-        'category_id' => $validatedData['category_id'], // Use category ID directly
-        'description' => $validatedData['description'],
-    ]);
+    {
+        // Validate the input data
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|numeric',
+            'description' => 'nullable|string',
+            'quantity' => 'required|integer|min:0', // Validate quantity
+        ]);
+    
+        // Create a new product
+        Product::create($validated);
 
     return redirect()->route('products.index')->with('message', 'Product added successfully');
 }
@@ -79,7 +76,8 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'price' => 'required|numeric',
             'description' => 'nullable|string|max:500',
-            'category_id' => 'sometimes|nullable|exists:categories,id', // Validate if category exists
+            'category_id' => 'sometimes|nullable|exists:categories,id',
+            'quantity' => 'required|integer|min:0', // Validate if category exists
         ]);
 
         $product = Product::findOrFail($id);
