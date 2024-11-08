@@ -3,7 +3,7 @@
     <div>
       <h1 class="text-2xl font-bold mb-4">Point of Sale</h1>
       <div class="flex">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden w-[70%] max-h-[470px]">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden w-[65%] max-h-[550px] flex flex-col">
           <div class="flex items-center p-4 border-b border-neutral-200">
             <label for="search" class="mr-2 font-medium">Search:</label>
             <input
@@ -13,7 +13,6 @@
               placeholder="Search Products..."
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-64 pl-10 p-2"
             />
-            <!-- Category filter dropdown -->
             <label for="category-filter" class="ml-4 mr-2 font-medium">Category:</label>
             <select
               id="category-filter"
@@ -29,11 +28,13 @@
             </select>
           </div>
           
-          <div class="overflow-x-auto">
-            <div v-if="products.length === 0" class="text-gray-500 text-center py-8">
-              No products yet
+          <!-- Conditional rendering for "No products to show" -->
+          <div class="overflow-x-auto flex-grow">
+            <div v-if="paginatedProducts.length === 0" class="text-gray-500 text-center py-8">
+              No products to show
             </div>
-            <table class="min-w-full text-left text-sm font-light text-gray-700">
+            
+            <table v-else class="min-w-full text-left text-sm font-light text-gray-700">
               <thead class="text-xs text-gray-700 uppercase bg-gray-200">
                 <tr>
                   <th scope="col" class="px-6 py-4">Id</th>
@@ -50,14 +51,23 @@
                   <td class="whitespace-nowrap px-6 py-4">{{ categoryMap[item.category_id] || 'Uncategorized' }}</td>
                   <td class="whitespace-nowrap px-6 py-4"><a>₱ </a>{{ item.price }}</td>
                   <td class="whitespace-nowrap px-6 py-4">
-                    <button @click="addToCart(item)">Add</button>
+                    <button 
+                      @click="addToCart(item)"
+                      class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg shadow-lg flex items-center space-x-2 transition duration-300"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l3.2-7H6.4M7 13l-2 5h13M13 16h6m-6 3h2m-2 0a1 1 0 01-1-1m1 1a1 1 0 001 1m-1-4h-2m0 0a1 1 0 00-1 1m1-1a1 1 0 001 1" />
+                      </svg>
+                      <span>Add</span>
+                    </button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <!-- pagination -->
-          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-t border-neutral-200 relative z-10">
+          
+          <!-- Pagination (pushed to bottom) -->
+          <div class="flex flex-col md:flex-row justify-between items-center p-4 border-t border-neutral-200 mt-auto relative z-10">
             <span class="text-sm font-normal text-gray-500">
               Showing <span class="font-semibold">{{ startItem }}</span> - <span class="font-semibold">{{ endItem }}</span> of <span class="font-semibold">{{ totalItems }}</span>
             </span>
@@ -76,14 +86,16 @@
         </div>
     
         <!-- Cart Summary Section -->
-        <div class="w-1/3 p-4">
-          <CartSummary :cartItems="cartItems" :cartTotal="cartTotal" @remove="removeFromCart" @update-quantity="handleUpdateQuantity"/>
-          <PaymentOptions :cartTotal="cartTotal" @processPayment="processPayment" />
-        </div>
+        <div class="w-[40%] p-6 bg-white shadow-md rounded-lg ml-4">
+  <CartSummary :cartItems="cartItems" :cartTotal="cartTotal" @remove="removeFromCart" @update-quantity="handleUpdateQuantity" />
+  <PaymentOptions :cartTotal="cartTotal" @processPayment="processPayment" />
+</div>
       </div>
     </div>
   </DashboardLayout>
 </template>
+
+
 <script setup>
 import CartSummary from './CartSummary.vue';
 import PaymentOptions from './PaymentOptions.vue';

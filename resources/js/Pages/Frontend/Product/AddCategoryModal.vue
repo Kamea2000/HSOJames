@@ -36,28 +36,31 @@
 <script setup>
 import { ref, defineProps, defineEmits } from 'vue';
 
-const props = defineProps(['isOpen']);
+// Props to control the modal visibility
+const props = defineProps({
+  isOpen: Boolean, // Whether the modal is open
+});
+
+// Emits to notify the parent component
 const emit = defineEmits();
 
+// Local state for the category name input
 const categoryName = ref('');
 
+// Submit handler
 const submit = () => {
   const trimmedName = categoryName.value.trim();
   if (trimmedName === '') {
     alert('Category name cannot be empty.');
-    return; // Prevent adding empty categories
+    return;
   }
-
   emit('add', trimmedName); // Emit the category name to the parent
   categoryName.value = ''; // Reset the input field after submission
   close(); // Close the modal
 };
 
+// Close the modal
 const close = () => {
-  emit('close'); // Emit a close event to the parent component
+  emit('close'); // Emit the close event to parent to change `isOpen` to false
 };
 </script>
-
-<style scoped>
-/* Add any additional styles here if necessary */
-</style>

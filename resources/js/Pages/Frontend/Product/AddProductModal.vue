@@ -89,7 +89,12 @@ const submit = () => {
   emit('close');
 };
 
+
 const resetForm = () => {
   product.value = { name: '', price: '', category_id: null, description: '' }; // Reset all fields
+};
+
+const close = () => {
+  emit('close'); // Emit the close event to parent to change `isOpen` to false
 };
 </script>

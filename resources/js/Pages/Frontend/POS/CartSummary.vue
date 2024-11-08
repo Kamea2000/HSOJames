@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white shadow-md rounded-lg p-6">
+  <div class="">
     <h2 class="text-xl font-semibold mb-4">Shopping Cart</h2>
 
     <p v-if="!cartItems.length" class="text-gray-500 text-center">
@@ -10,37 +10,43 @@
       <li
         v-for="item in cartItems"
         :key="item.id"
-        class="flex items-center justify-between border-b border-gray-200 py-3"
+        class="flex justify-between items-center border-b border-gray-200 py-3"
       >
-        <div class="flex flex-col">
-          <span class="font-medium text-gray-800">{{ item.name }}</span>
-          <div class="flex items-center space-x-2 mt-1">
-            <button
-  @click="updateQuantity(item.id, item.quantity - 1)"
-  class="text-gray-500 hover:text-gray-700 p-1"
-  :disabled="item.quantity <= 1"
-  aria-label="Decrease quantity"
->
-<i class="fas fa-minus-circle"></i>
-</button>
-<span class="text-gray-800 font-medium">{{ item.quantity }}</span>
-<button
-  @click="updateQuantity(item.id, item.quantity + 1)"
-  class="text-gray-500 hover:text-gray-700 p-1"
-  aria-label="Increase quantity"
->
-<i class="fas fa-plus-circle"></i>
-</button>
-          </div>
-        </div>
+        <!-- Left-aligned section with item name -->
+        <span class="flex-grow text-sm font-medium text-gray-800">{{ item.name }}</span>
+
+        <!-- Right-aligned section with price, quantity controller, and remove button -->
         <div class="flex items-center space-x-4">
-          <span class="font-semibold text-gray-900">₱{{ item.price * item.quantity }}</span>
+          <!-- Price -->
+          <span class="font-semibold text-gray-900">₱{{ (item.price * item.quantity).toFixed(2) }}</span>
+
+          <!-- Quantity Controller -->
+          <div class="flex items-center space-x-2">
+            <button
+              @click="updateQuantity(item.id, item.quantity - 1)"
+              class="text-gray-500 hover:text-gray-700 p-1"
+              :disabled="item.quantity <= 1"
+              aria-label="Decrease quantity"
+            >
+              <i class="fas fa-minus-circle"></i>
+            </button>
+            <span class="text-gray-800 font-medium">{{ item.quantity }}</span>
+            <button
+              @click="updateQuantity(item.id, item.quantity + 1)"
+              class="text-gray-500 hover:text-gray-700 p-1"
+              aria-label="Increase quantity"
+            >
+              <i class="fas fa-plus-circle"></i>
+            </button>
+          </div>
+
+          <!-- Remove Button -->
           <button
             @click="emitRemove(item.id)"
             class="text-red-500 hover:text-red-700"
             aria-label="Remove item"
           >
-            <i class="fas fa-trash"></i> Remove
+            <i class="fas fa-trash"></i>
           </button>
         </div>
       </li>
@@ -49,7 +55,7 @@
     <div class="mt-4">
       <div class="flex justify-between items-center">
         <span class="text-lg font-semibold text-gray-900">Total:</span>
-        <span class="text-xl font-bold text-gray-800">₱{{ cartTotal }}</span>
+        <span class="text-xl font-bold text-gray-800">₱{{ cartTotal.toFixed(2) }}</span>
       </div>
     </div>
   </div>
@@ -81,5 +87,4 @@ const updateQuantity = (itemId, newQuantity) => {
     emit('update-quantity', { itemId, quantity: newQuantity });
   }
 };
-
 </script>

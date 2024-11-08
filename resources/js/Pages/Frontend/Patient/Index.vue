@@ -205,9 +205,13 @@ const openModal = (type, item) => {
 
 
 const closeModal = () => {
-    showModal.value = false;
-    editModal.value = false;
-    selectedPatients.value = null;
+    if (type === 'edit') {
+        selectedPatients.value = false; // Set the selected patient
+        editModal.value = true;
+    } else if (type === 'show') {
+        selectedPatients.value = null; // Set the selected patient
+        showModal.value = false;
+    }
 };
 // Computed property to filter patients based on search query
 const filteredPatients = computed(() => {
