@@ -19,6 +19,7 @@ class PatientController extends Controller
 
     return Inertia::render('Frontend/Patient/Index', [
         'patients' => $patients,
+
     ]);
 }
       

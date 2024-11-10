@@ -5,7 +5,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\POSController;
-use App\Http\Controllers\CartController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -25,10 +25,15 @@ Route::get('/placeholder', function () {
 })->name('placeholder');
 
 
+
+
+// This is enough for the dashboard route
+
 Route::resource('products', ProductController::class);
 Route::resource('patients', PatientController::class);
 Route::resource('pos', POSController::class);
 Route::resource('categories', CategoryController::class);
+Route::resource('rawboard', DashboardController::class);
 
 
 
