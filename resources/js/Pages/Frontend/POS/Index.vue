@@ -88,7 +88,6 @@
         <!-- Cart Summary Section -->
         <div class="w-[40%] p-6 bg-white shadow-md rounded-lg ml-4">
   <CartSummary :cartItems="cartItems" :cartTotal="cartTotal" @remove="removeFromCart" @update-quantity="handleUpdateQuantity" />
-  <PaymentOptions :cartTotal="cartTotal" @processPayment="processPayment" />
 </div>
       </div>
     </div>
@@ -98,7 +97,7 @@
 
 <script setup>
 import CartSummary from './CartSummary.vue';
-import PaymentOptions from './PaymentOptions.vue';
+
 import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import { Inertia } from '@inertiajs/inertia'; // Make sure this line is present
 import { ref, watch, computed, defineProps} from 'vue';;

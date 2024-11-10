@@ -2,7 +2,6 @@
 import DashboardLayout from '@/Layouts/DashboardLayout.vue';
 import { Head } from '@inertiajs/vue3';
 import Cards from '@/Components/Cards.vue';
-import DataStatsOne from '@/Components/Cards.vue';
 </script>
 
 <template>
@@ -10,6 +9,7 @@ import DataStatsOne from '@/Components/Cards.vue';
   
     <DashboardLayout>
         <Cards />
+        
     </DashboardLayout>
   </template>
   

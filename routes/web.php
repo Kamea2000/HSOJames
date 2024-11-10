@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
@@ -34,6 +35,8 @@ Route::resource('patients', PatientController::class);
 Route::resource('pos', POSController::class);
 Route::resource('categories', CategoryController::class);
 Route::resource('rawboard', DashboardController::class);
+Route::resource('transactions', TransactionController::class);
+
 
 
 

@@ -63,15 +63,29 @@ import { ref, defineEmits } from 'vue';
 const emit = defineEmits();
 const paymentMethod = ref('cash');
 const discountAmount = ref(0);
-const isDiscounted = ref(false);  // New property for the radio button
 
-// Emits payment details to parent component
+import { Inertia } from '@inertiajs/inertia';
+
 const processPayment = () => {
-  const paymentDetails = {
-    method: paymentMethod.value,
-    discount: isDiscounted.value ? discountAmount.value : 0,  // Use discountAmount if discounted is selected
+  const transactionData = {
+    customer_name: name,
+    payment_method: paymentMethod,
+    discount_amount: paymentMethod === 'discount' ? discountAmount : null,
+    total_amount: cartTotal.value,
+    cart_items: cartItems,
   };
-  emit('processPayment', paymentDetails);
+
+  Inertia.post('/transactions', transactionData, {
+    onSuccess: (page) => {
+      console.log(page.props.flash.message || 'Transaction recorded successfully');
+      // You can use page.props.flash.message if you set a flash message in the controller
+      // Handle success, such as showing a success message or redirecting
+    },
+    onError: (errors) => {
+      console.error(errors);
+      // Handle errors (e.g., display validation errors)
+    }
+  });
 };
 </script>
 

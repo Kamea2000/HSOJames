@@ -1,5 +1,5 @@
 <template>
-  <div class="">
+  <div>
     <h2 class="text-xl font-semibold mb-4">Shopping Cart</h2>
 
     <p v-if="!cartItems.length" class="text-gray-500 text-center">
@@ -12,20 +12,14 @@
         :key="item.id"
         class="flex justify-between items-center border-b border-gray-200 py-3"
       >
-        <!-- Left-aligned section with item name -->
         <span class="flex-grow text-sm font-medium text-gray-800">{{ item.name }}</span>
-
-        <!-- Right-aligned section with price, quantity controller, and remove button -->
         <div class="flex items-center space-x-4">
-          <!-- Price -->
           <span class="font-semibold text-gray-900">₱{{ (item.price * item.quantity).toFixed(2) }}</span>
 
-          <!-- Quantity Controller -->
           <div class="flex items-center space-x-2">
             <button
               @click="updateQuantity(item.id, item.quantity - 1)"
-              class="text-gray-500 hover:text-gray-700 p-1"
-              :disabled="item.quantity <= 1"
+              :disabled="item.quantity && item.quantity <= 1"
               aria-label="Decrease quantity"
             >
               <i class="fas fa-minus-circle"></i>
@@ -40,7 +34,6 @@
             </button>
           </div>
 
-          <!-- Remove Button -->
           <button
             @click="emitRemove(item.id)"
             class="text-red-500 hover:text-red-700"
@@ -58,33 +51,81 @@
         <span class="text-xl font-bold text-gray-800">₱{{ cartTotal.toFixed(2) }}</span>
       </div>
     </div>
+
+    <!-- Customer Name Input -->
+    <div class="mt-4">
+      <label for="name" class="block text-gray-700 font-medium mb-2">Customer Name</label>
+      <input
+        v-model="name"
+        id="name"
+        type="text"
+        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+        required
+        placeholder="Enter customer name"
+      />
+    </div>
+
+    <!-- Discount Amount Input -->
+    <div class="mt-4">
+      <label class="block text-gray-700 font-medium mb-2">Discount Amount</label>
+      <input
+        type="number"
+        v-model="discountAmount"
+        placeholder="Enter discount amount"
+        class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+      />
+    </div>
+
+    <button
+      @click="processPayment"
+      class="mt-6 w-full py-3 bg-green-500 text-white rounded-lg font-semibold shadow-md hover:bg-green-700 transition duration-300"
+    >
+      Process Payment
+    </button>
+
+    <!-- Success Message (rendered from Inertia response) -->
+    <p v-if="message" class="mt-4 text-green-500">{{ message }}</p>
   </div>
 </template>
 
 <script setup>
-import { defineProps, defineEmits, computed } from 'vue';
+import { defineProps, defineEmits, computed, ref } from 'vue';
+import { Inertia } from '@inertiajs/inertia';
+import { usePage } from '@inertiajs/inertia-vue3';
+
 
 const props = defineProps({
-  cartItems: Array,
+  cartItems: { type: Array, required: true },
+  message: { type: String, default: '' },
 });
 
 const emit = defineEmits();
 
-// Computes the total price based on cart items
+const name = ref('');
+const discountAmount = ref(0);
+
 const cartTotal = computed(() => {
-  return props.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subtotal = props.cartItems.reduce((total, item) => total + (item.price * item.quantity || 0), 0);
+  return Math.max(subtotal - discountAmount.value, 0);
 });
 
-// Emits a request to remove an item from the cart
 const emitRemove = (itemId) => {
   emit('remove', itemId);
 };
 
-// Emits an update request to change item quantity
 const updateQuantity = (itemId, newQuantity) => {
-  console.log('Updating quantity for item', itemId, 'to', newQuantity);
   if (newQuantity > 0) {
     emit('update-quantity', { itemId, quantity: newQuantity });
   }
+};
+
+const processPayment = () => {
+  // Perform the Inertia post request to handle the transaction
+  Inertia.post(route('transactions.store'), {
+    customer_name: name.value,
+    total: cartTotal.value,
+    discount_amount: discountAmount.value,
+    cart_items: props.cartItems,
+  });
 };
 </script>
